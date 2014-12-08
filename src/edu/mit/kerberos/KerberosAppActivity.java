@@ -127,7 +127,11 @@ public class KerberosAppActivity extends TabActivity
      * Getting server and client info.
      * return 0 is success.
      */
-    public String getServiceTicket(String serverP, String serverIp, String serverPt, String clientPrincipal){
+    public String getServiceTicket(String serverP, String serverIp, int serverPt, String clientPrincipal){
+        servicePrincipal="HTTP@xvm.mit.edu";
+        server="18.181.0.62";
+        port=442;
+        clientPrincipal="lsyang";
         int ret=0;
         String error="";
         String ticket="";
