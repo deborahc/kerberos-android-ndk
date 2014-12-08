@@ -4,7 +4,20 @@
       android:versionCode="1"
       android:versionName="1.0">
     <uses-sdk android:minSdkVersion="10" />
+    
+    <permission android:description="@string/app_name"
+        android:label="Talk to Dummy Kerberos"
+        android:name="com.example.dummyKerb.END_PERM"
+        android:protectionLevel="dangerous"></permission>
+    <permission android:description="@string/app_name"
+        android:label="Talk to Dummy Kerberos"
+        android:name="com.example.dummyKerb.LISTEN_PERM"
+        android:protectionLevel="dangerous"></permission>
+    
+    <uses-permission android:name="com.example.dummyKerb.SEND_PERM" />
+    <uses-permission android:name="com.example.dummyKerb.LISTEN_PERM" />
 	<uses-permission android:name="android.permission.INTERNET" /> 
+	
     <application android:label="@string/app_name" android:icon="@drawable/icon">
         <activity android:name="KerberosAppActivity"
                   android:label="@string/app_name"
@@ -14,5 +27,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name="com.example.dummykerb.BReceiver"
+            android:enabled="true"
+            android:permission="com.example.dummyKerb.SEND_PERM">
+            <intent-filter>
+                <action android:name="com.example.dummyKerb.TESTING" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest> 
