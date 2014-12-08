@@ -47,9 +47,12 @@
  */
 package edu.mit.kerberos;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -119,6 +122,48 @@ public class KerberosAppActivity extends TabActivity
             System.exit(1);
         }
     }
+    
+    /*
+     * Getting server and client info.
+     * return 0 is success.
+     */
+    public String getServiceTicket(String serverP, String serverIp, String serverPt, String clientPrincipal){
+        int ret=0;
+        String error="";
+        String ticket="";
+//      System.out.println("serverP "+ serverP);
+//      System.out.println("serverIp "+ serverIp);
+//      System.out.println("serverPt "+ serverPt);
+
+        //port = Integer.valueOf(serverPt);     
+        try {
+            ret = startClient();
+        } catch (Exception e) {
+            error+="Caught Exception\n";
+            e.printStackTrace();
+        }
+        if (ret != 0)
+            error+="Client Did Not Finish Successfully!\n";
+        //read from file
+        try {
+            FileInputStream fis = new FileInputStream (new File("/data/local/kerberos/ccache/krb5cc_" + uid));
+            BufferedReader inputReader = new BufferedReader(
+            new InputStreamReader(fis));
+            String inputString;
+            StringBuffer stringBuffer = new StringBuffer();                
+            while ((inputString = inputReader.readLine()) != null) {
+                stringBuffer.append(inputString + "\n");
+            }
+           fis.close();
+           ticket = stringBuffer.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("TICKET IS "+ ticket);
+        return ticket;
+    }
+
+    
 
     /**
 	 * Button listener for kinit ("Get Ticket") button.
@@ -129,7 +174,8 @@ public class KerberosAppActivity extends TabActivity
 			
 			TextView tv = (TextView) findViewById(R.id.textViewClient);
 			EditText principal = (EditText) findViewById(R.id.etClientPrincipal);
-			String prinValue = principal.getText().toString();
+			//String prinValue = principal.getText().toString();
+			String prinValue="lsyang";
             String argString;
             int ret = 0;
 			
@@ -259,63 +305,105 @@ public class KerberosAppActivity extends TabActivity
 	private OnClickListener clientAppButtonListener = new OnClickListener() 
     {
 		public void onClick(View v) {
-			
-			TextView tv = (TextView) findViewById(R.id.textViewApp);
-            int ret = 0;
+		        servicePrincipal="HTTP@xvm.mit.edu";
+		        server="18.181.0.62";
+		        port=442;
+		        clientPrincipal="lsyang";
+		        int ret=0;
+		        String error="";
+		        String ticket="";
+//		        System.out.println("serverP "+ serverP);
+//		        System.out.println("serverIp "+ serverIp);
+//		        System.out.println("serverPt "+ serverPt);
 
-            /* clear Client App TextView */
-			tv.setText("");
-		
-            /* set server info */    
-            EditText serverPrincipal = (EditText) findViewById(R.id.etServerPrincipal);
-            EditText serverIpAddress = (EditText) findViewById(R.id.etServerIpAddress);
-            EditText serverPort = (EditText) findViewById(R.id.etServerPort);
-			String serverP = serverPrincipal.getText().toString();
-			String serverIp = serverIpAddress.getText().toString();
-			String serverPt = serverPort.getText().toString();
-            if (serverP.matches("")) {
-                tv.append("You need to specify a server principal in tab 2.\n");
-                ret = 1;
-            } else {
-                servicePrincipal = serverP;
-            }
-            if (serverIp.matches("")) {
-                tv.append("You need to specify a server IP address in tab 2.\n");
-                ret = 1;
-            } else {
-                server = serverIp;
-            }
-            if (serverPt.matches("")) {
-                tv.append("You need to specifiy a server port number in tab 2.\n");
-                ret = 1;
-            } else {
-                port = Integer.valueOf(serverPt);
-            }
-
-            /* set client info */
-            EditText clientPrin = (EditText) findViewById(R.id.etClientPrincipal);
-            String clientP = clientPrin.getText().toString();
-            if (clientP.matches("")) {
-                tv.append("You need to specify a client principal in tab 1.\n");
-                ret = 1;
-            } else {
-                clientPrincipal = clientP;
-            }
-
-            /* if input is bad, exit early */
-            if (ret != 0)
-                return;
-            
-            try {
-                ret = startClient();
-            } catch (Exception e) {
-                tv.append("Caught Exception\n");
-                e.printStackTrace();
-            }
-
-            if (ret != 0)
-                tv.append("Client Did Not Finish Successfully!\n");
-		}
+		        //port = Integer.valueOf(serverPt);     
+		        try {
+		            ret = startClient();
+		        } catch (Exception e) {
+		            error+="Caught Exception\n";
+		            e.printStackTrace();
+		        }
+		        if (ret != 0)
+		            error+="Client Did Not Finish Successfully!\n";
+		        //read from file
+		        try {
+		            FileInputStream fis = new FileInputStream (new File("/data/local/kerberos/ccache/krb5cc_" + uid));
+		            BufferedReader inputReader = new BufferedReader(
+		            new InputStreamReader(fis));
+		            String inputString;
+		            StringBuffer stringBuffer = new StringBuffer();                
+		            while ((inputString = inputReader.readLine()) != null) {
+		                stringBuffer.append(inputString + "\n");
+		            }
+		           fis.close();
+		           ticket = stringBuffer.toString();
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		        }
+		        System.out.println("TICKET IS "+ ticket);
+		        //return ret;
+		    }
+		    
+			//original code
+//			TextView tv = (TextView) findViewById(R.id.textViewApp);
+//            int ret = 0;
+//
+//            /* clear Client App TextView */
+//			tv.setText("");
+//		
+//            /* set server info */    
+//            EditText serverPrincipal = (EditText) findViewById(R.id.etServerPrincipal);
+//            EditText serverIpAddress = (EditText) findViewById(R.id.etServerIpAddress);
+//            EditText serverPort = (EditText) findViewById(R.id.etServerPort);
+//			String serverP = serverPrincipal.getText().toString();
+//			String serverIp = serverIpAddress.getText().toString();
+//			String serverPt = serverPort.getText().toString();
+//			System.out.println("serverP "+ serverP);
+//			System.out.println("serverIp "+ serverIp);
+//			System.out.println("serverPt "+ serverPt);
+//            if (serverP.matches("")) {
+//                tv.append("You need to specify a server principal in tab 2.\n");
+//                ret = 1;
+//            } else {
+//                servicePrincipal = serverP;
+//            }
+//            if (serverIp.matches("")) {
+//                tv.append("You need to specify a server IP address in tab 2.\n");
+//                ret = 1;
+//            } else {
+//                server = serverIp;
+//            }
+//            if (serverPt.matches("")) {
+//                tv.append("You need to specifiy a server port number in tab 2.\n");
+//                ret = 1;
+//            } else {
+//                port = Integer.valueOf(serverPt);
+//            }
+//
+//            /* set client info */
+//            EditText clientPrin = (EditText) findViewById(R.id.etClientPrincipal);
+//            String clientP = clientPrin.getText().toString();
+//            if (clientP.matches("")) {
+//                tv.append("You need to specify a client principal in tab 1.\n");
+//                ret = 1;
+//            } else {
+//                clientPrincipal = clientP;
+//            }
+//
+//            /* if input is bad, exit early */
+//            if (ret != 0)
+//                return;
+//            
+//            try {
+//                ret = startClient();
+//            } catch (Exception e) {
+//                tv.append("Caught Exception\n");
+//                e.printStackTrace();
+//            }
+//
+//            if (ret != 0)
+//                tv.append("Client Did Not Finish Successfully!\n");
+//		}
 	};
 
     /**
@@ -458,6 +546,7 @@ public class KerberosAppActivity extends TabActivity
      */
     private int startClient() throws Exception
     {
+        System.out.println("starting client");
     	TextView tv = (TextView) findViewById(R.id.textViewApp);
         
         int ret = 0;
@@ -496,6 +585,8 @@ public class KerberosAppActivity extends TabActivity
 
         try {
             clientSocket = new Socket(server, port);
+            System.out.println("server is "+ server);
+            System.out.println("port is "+ port);
             tv.append("Connected to " + server + " at port " + port + "\n");
 
             /* get input and output streams */
@@ -564,9 +655,11 @@ public class KerberosAppActivity extends TabActivity
         try {
             GSSName peer = mgr.createName(servicePrincipal,
                     GSSName.NT_HOSTBASED_SERVICE);
+            System.out.println("peer is "+ peer);
 
             context = mgr.createContext(peer, mech, clientCred,
                     GSSContext.INDEFINITE_LIFETIME);
+            System.out.println("context is "+ context);
 
             context.requestConf(true);
             context.requestReplayDet(true);
@@ -619,6 +712,8 @@ public class KerberosAppActivity extends TabActivity
             e.printStackTrace();
             return FAILURE;
         }
+        System.out.print("here!!!!");
+        System.out.println("message is "+tv.getText().toString());
 
         return SUCCESS;
 
@@ -647,6 +742,7 @@ public class KerberosAppActivity extends TabActivity
             messagInfo.setPrivacy(true);
 
             outToken = context.wrap(buffer, 0, buffer.length, messagInfo);
+            System.out.println("outToke in "+outToken);
             err = GssUtil.WriteToken(tv, serverOut, outToken);
             if (err == 0) {
                 tv.append("Sent message to server ('" +
@@ -654,6 +750,7 @@ public class KerberosAppActivity extends TabActivity
 
                 /* Read signature block from the server */ 
                 inToken = GssUtil.ReadToken(tv, serverIn);
+                System.out.println("token is "+ inToken);
                 tv.append("Received sig block from server...\n");
 
                 GSSName serverInfo = context.getTargName();
