@@ -27,13 +27,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver
-            android:name="com.example.dummykerb.BReceiver"
-            android:enabled="true"
-            android:permission="com.example.dummyKerb.SEND_PERM">
-            <intent-filter>
-                <action android:name="com.example.dummyKerb.TESTING" />
-            </intent-filter>
-        </receiver>
     </application>
 </manifest> 

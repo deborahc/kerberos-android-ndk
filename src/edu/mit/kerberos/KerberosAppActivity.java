@@ -59,8 +59,10 @@ import java.net.UnknownHostException;
 
 import android.app.Activity;
 import android.app.TabActivity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -83,7 +85,7 @@ public class KerberosAppActivity extends TabActivity
     public native int nativeSetKRB5CONFIG(String path);
     public native int nativeKinit(String argv, int argc);
     public native int nativeKlist(String argv, int argc);
-    public static native int nativeKvno(String argv, int argc);
+    public native int nativeKvno(String argv, int argc);
     public native int nativeKdestroy(String argv, int argc);
 
     /* Server Information for Client Application */    
@@ -113,6 +115,8 @@ public class KerberosAppActivity extends TabActivity
     /* default kerberos configuration file location, used to set
        native KRB5_CONFIG environment variable */
     private static String defaultKRB5_CONFIG = "/data/local/kerberos/krb5.conf";
+    
+    private IntentFilter filter1;
 
     /* Load our native library for SWIG stuff and native JNI functions */
     static {
@@ -167,63 +171,6 @@ public class KerberosAppActivity extends TabActivity
         }
         System.out.println("TICKET IS "+ ticket);
         return ticket;
-    }
-    
-    /**
-     * Static wrapper for kvno.
-     */
-    public static int kvno(String principal) {
-        String argString = "-c /data/local/kerberos/ccache/krb5cc_" + 
-                uid + " -k /data/local/kerberos/krb5.keytab " + principal;
-        return nativeKvno(argString, countWords(argString));
-    }
-    
-    /**
-     * 
-     */
-    protected static String readServiceTicket() {
-    	String ticket = "";
-        //read from file
-        try {
-            FileInputStream fis = new FileInputStream (new File("/data/local/kerberos/ccache/krb5cc_" + uid));
-            BufferedReader inputReader = new BufferedReader(
-            new InputStreamReader(fis));
-            String inputString;
-            StringBuffer stringBuffer = new StringBuffer();                
-            while ((inputString = inputReader.readLine()) != null) {
-                stringBuffer.append(inputString + "\n");
-            }
-           fis.close();
-           ticket = stringBuffer.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Reading: TICKET IS "+ ticket);
-        return ticket;
-    }
-    
-    /**
-     * Called by BReceiver to get the Kerberos ticket and send reply.
-     */
-    protected static void sendServiceTicket(Context c, String s) {
-    	String argString = "blah";
-    	System.out.println("Trying to get ticket");
-    	int t = nativeKvno(argString, countWords(argString));
-    	System.out.println("Got ticket");
-    	
-    	Intent intent = new Intent();
-    	intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-        intent.setAction("com.example.dummydemo.TESTING");
-        intent.setPackage(s);
-        
-        System.out.println("Start of line.");
-    	String ticket = readServiceTicket();
-    	System.out.println("Got ticket " + ticket);
-    	// "Mess" is the human-readable message to display on service app.  
-    	intent.putExtra("mess", "HIHIHIHIHIHIHIIHIHIHI");
-    	intent.putExtra("ticket", ticket);
-    	c.sendBroadcast(intent);
-    	System.out.println("End of line.");
     }
     
 
@@ -477,7 +424,32 @@ public class KerberosAppActivity extends TabActivity
         super.onDestroy();
 	    String argString = "-c /data/local/kerberos/ccache/krb5cc_" + uid;
 	    int t = nativeKdestroy(argString, countWords(argString));
+
+        unregisterReceiver(myReceiver);
     }
+    
+    protected static void sendTicket(Context c, String p, String t) {
+    	System.out.println("Got here");
+    	Intent intent = new Intent();
+    	intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        intent.setAction("com.example.dummydemo.TESTING");
+        intent.setPackage(p);
+        intent.putExtra("ticket", t);
+        c.sendBroadcast(intent);
+    }
+    
+    private final BroadcastReceiver myReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+        	System.out.println("Received at Kerb");
+    		Log.d("Debug", "Received at Kerb");
+    		String s = intent.getExtras().getString("package");
+    		System.out.println("PACKKKKK" + s);
+    		Log.d("Debug", s);
+    		sendTicket(context, s, getServiceTicket("", "", 0, ""));
+        }
+    };
 	
     /**
      * Called when the activity is first created. 
@@ -488,6 +460,10 @@ public class KerberosAppActivity extends TabActivity
         int ret = 0;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        System.out.println("VSDJFLKJSDLF");
+        filter1 = new IntentFilter("com.example.dummyKerb.TESTING");
+        registerReceiver(myReceiver, filter1, "com.example.dummyKerb.SEND_PERM", null);
 
         TabHost mTabHost = getTabHost();
 
