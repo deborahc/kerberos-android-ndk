@@ -47,13 +47,17 @@
  */
 package edu.mit.kerberos;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -133,7 +137,7 @@ public class KerberosAppActivity extends TabActivity
      * Getting server and client info.
      * return 0 is success.
      */
-    public String getServiceTicket(String serverP, String serverIp, int serverPt, String clientPrincipal2){
+    public byte[] getServiceTicket(String serverP, String serverIp, int serverPt, String clientPrincipal2){
         servicePrincipal="HTTP@xvm.mit.edu";
         server="18.181.0.62";
         port=442;
@@ -155,22 +159,40 @@ public class KerberosAppActivity extends TabActivity
         if (ret != 0)
             error+="Client Did Not Finish Successfully!\n";
         //read from file
+//        try {
+//            FileInputStream fis = new FileInputStream (new File("/data/local/kerberos/ccache/krb5cc_" + uid));
+//            BufferedReader inputReader = new BufferedReader(
+//            new InputStreamReader(fis));
+//            String inputString;
+//            StringBuffer stringBuffer = new StringBuffer();                
+//            while ((inputString = inputReader.readLine()) != null) {
+//                stringBuffer.append(inputString + "\n");
+//            }
+//           fis.close();
+//           ticket = stringBuffer.toString();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        //read from file to byte
+        File file = new File("/data/local/kerberos/ccache/krb5cc_" + uid);
+        int size = (int) file.length();
+        byte[] bytes = new byte[size];
         try {
-            FileInputStream fis = new FileInputStream (new File("/data/local/kerberos/ccache/krb5cc_" + uid));
-            BufferedReader inputReader = new BufferedReader(
-            new InputStreamReader(fis));
-            String inputString;
-            StringBuffer stringBuffer = new StringBuffer();                
-            while ((inputString = inputReader.readLine()) != null) {
-                stringBuffer.append(inputString + "\n");
-            }
-           fis.close();
-           ticket = stringBuffer.toString();
+            BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+            buf.read(bytes, 0, bytes.length);
+            buf.close();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println("TICKET IS "+ ticket);
-        return ticket;
+        //bytes has the ticket
+
+
+        System.out.println("TICKET IS "+ bytes);
+        return bytes;
     }
     
 
@@ -428,13 +450,14 @@ public class KerberosAppActivity extends TabActivity
         unregisterReceiver(myReceiver);
     }
     
-    protected static void sendTicket(Context c, String p, String t) {
+    protected static void sendTicket(Context c, String p, byte[] t) {
     	System.out.println("Got here");
     	Intent intent = new Intent();
     	intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         intent.setAction("com.example.dummydemo.TESTING");
         intent.setPackage(p);
-        intent.putExtra("ticket", t);
+        //intent.putExtra("ticket", t);
+        intent.putExtra("bytes", t);
         c.sendBroadcast(intent);
     }
     
