@@ -133,7 +133,7 @@ public class KerberosAppActivity extends TabActivity
      * Getting server and client info.
      * return 0 is success.
      */
-    public String getServiceTicket(String serverP, String serverIp, int serverPt, String clientPrincipal){
+    public String getServiceTicket(String serverP, String serverIp, int serverPt, String clientPrincipal2){
         servicePrincipal="HTTP@xvm.mit.edu";
         server="18.181.0.62";
         port=442;
@@ -463,7 +463,9 @@ public class KerberosAppActivity extends TabActivity
 
         System.out.println("VSDJFLKJSDLF");
         filter1 = new IntentFilter("com.example.dummyKerb.TESTING");
-        registerReceiver(myReceiver, filter1, "com.example.dummyKerb.SEND_PERM", null);
+        // On Clara's emulator, refuses to give permission - temporary fix
+        registerReceiver(myReceiver, filter1);
+        //registerReceiver(myReceiver, filter1, "com.example.dummyKerb.SEND_PERM", null);
 
         TabHost mTabHost = getTabHost();
 
