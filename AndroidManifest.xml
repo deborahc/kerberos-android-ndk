@@ -7,7 +7,7 @@
     
     <permission android:description="@string/app_name"
         android:label="Talk to Dummy Kerberos"
-        android:name="com.example.dummyKerb.END_PERM"
+        android:name="com.example.dummyKerb.SEND_PERM"
         android:protectionLevel="dangerous"></permission>
     <permission android:description="@string/app_name"
         android:label="Talk to Dummy Kerberos"

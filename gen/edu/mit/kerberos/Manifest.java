@@ -9,7 +9,7 @@ package edu.mit.kerberos;
 
 public final class Manifest {
     public static final class permission {
-        public static final String END_PERM="com.example.dummyKerb.END_PERM";
         public static final String LISTEN_PERM="com.example.dummyKerb.LISTEN_PERM";
+        public static final String SEND_PERM="com.example.dummyKerb.SEND_PERM";
     }
 }
