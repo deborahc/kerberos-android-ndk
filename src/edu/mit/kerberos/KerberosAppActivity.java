@@ -459,6 +459,7 @@ public class KerberosAppActivity extends TabActivity
         //intent.putExtra("ticket", t);
         intent.putExtra("bytes", t);
         c.sendBroadcast(intent);
+        // c.sendBroadcast(intent, "com.example.dummyKerb.GET_REPLY_PERM");
     }
     
     private final BroadcastReceiver myReceiver = new BroadcastReceiver() {
@@ -488,7 +489,7 @@ public class KerberosAppActivity extends TabActivity
         filter1 = new IntentFilter("com.example.dummyKerb.TESTING");
         // On Clara's emulator, refuses to give permission - temporary fix
         registerReceiver(myReceiver, filter1);
-        //registerReceiver(myReceiver, filter1, "com.example.dummyKerb.SEND_PERM", null);
+        //registerReceiver(myReceiver, filter1, "com.example.dummyKerb.SEND_REQUEST_PERM", null);
 
         TabHost mTabHost = getTabHost();
 

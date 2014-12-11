@@ -7,15 +7,20 @@
     
     <permission android:description="@string/app_name"
         android:label="Talk to Dummy Kerberos"
-        android:name="com.example.dummyKerb.SEND_PERM"
+        android:name="com.example.dummyKerb.SEND_REQUEST_PERM"
         android:protectionLevel="dangerous"></permission>
     <permission android:description="@string/app_name"
-        android:label="Talk to Dummy Kerberos"
-        android:name="com.example.dummyKerb.LISTEN_PERM"
+        android:label="Listen to requests made to Dummy Kerberos"
+        android:name="com.example.dummyKerb.KERB_LISTENER_PERM"
+        android:protectionLevel="dangerous"></permission>
+    <permission android:description="@string/app_name"
+        android:label="Listen to replies from Dummy Kerberos"
+        android:name="com.example.dummyKerb.GET_REPLY_PERM"
         android:protectionLevel="dangerous"></permission>
     
-    <uses-permission android:name="com.example.dummyKerb.SEND_PERM" />
-    <uses-permission android:name="com.example.dummyKerb.LISTEN_PERM" />
+    <uses-permission android:name="com.example.dummyKerb.SEND_REQUEST_PERM" />
+    <uses-permission android:name="com.example.dummyKerb.KERB_LISTENER_PERM" />
+    <uses-permission android:name="com.example.dummyKerb.GET_REPLY_PERM" />
 	<uses-permission android:name="android.permission.INTERNET" /> 
 	
     <application android:label="@string/app_name" android:icon="@drawable/icon">
