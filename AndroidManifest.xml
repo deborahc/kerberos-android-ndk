@@ -6,16 +6,21 @@
     <uses-sdk android:minSdkVersion="10" />
     
     <permission android:description="@string/app_name"
-        android:label="Talk to Dummy Kerberos"
-        android:name="com.example.dummyKerb.END_PERM"
+        android:label="Send request to Kerberos manager for service ticket."
+        android:name="com.example.dummyKerb.SEND_REQUEST_PERM"
         android:protectionLevel="dangerous"></permission>
     <permission android:description="@string/app_name"
-        android:label="Talk to Dummy Kerberos"
-        android:name="com.example.dummyKerb.LISTEN_PERM"
+        android:label="Listen to requests for service ticket"
+        android:name="com.example.dummyKerb.KERB_LISTENER_PERM"
+        android:protectionLevel="dangerous"></permission>
+    <permission android:description="@string/app_name"
+        android:label="Listen to replies from Kerberos manager containing service tickets"
+        android:name="com.example.dummyKerb.GET_REPLY_PERM"
         android:protectionLevel="dangerous"></permission>
     
-    <uses-permission android:name="com.example.dummyKerb.SEND_PERM" />
-    <uses-permission android:name="com.example.dummyKerb.LISTEN_PERM" />
+    <uses-permission android:name="com.example.dummyKerb.SEND_REQUEST_PERM" />
+    <uses-permission android:name="com.example.dummyKerb.KERB_LISTENER_PERM" />
+    <uses-permission android:name="com.example.dummyKerb.GET_REPLY_PERM" />
 	<uses-permission android:name="android.permission.INTERNET" /> 
 	
     <application android:label="@string/app_name" android:icon="@drawable/icon">
