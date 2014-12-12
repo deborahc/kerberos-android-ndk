@@ -160,7 +160,7 @@ public class KerberosAppActivity extends TabActivity {
      * 6.858 - 
      * Get service ticket with the specified parameters.
      */
-    public byte[] getServiceTicket(String serviceP, String serverIp,
+    protected byte[] getServiceTicket(String serviceP, String serverIp,
             int serverPt) {
 
         EditText principal = (EditText) findViewById(R.id.etClientPrincipal);
