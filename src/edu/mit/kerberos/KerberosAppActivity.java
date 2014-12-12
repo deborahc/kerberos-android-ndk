@@ -132,24 +132,51 @@ public class KerberosAppActivity extends TabActivity
             System.exit(1);
         }
     }
+    public void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+    }
     
     /*
      * Getting server and client info.
      * return 0 is success.
      */
-    public byte[] getServiceTicket(String serverP, String serverIp, int serverPt, String clientPrincipal2){
-        servicePrincipal="HTTP@xvm.mit.edu";
-        server="18.181.0.62";
-        port=442;
-        clientPrincipal="lsyang";
+    public byte[] getServiceTicket(String serviceP, String serverIp, int serverPt){
+        //servicePrincipal="HTTP@xvm.mit.edu";
+        //server="18.181.0.62";
+        //port=442;
+        System.out.println("Client Principal "+ clientPrincipal);
+        EditText principal = (EditText) findViewById(R.id.etClientPrincipal);
+        clientPrincipal = principal.getText().toString();
+
+        System.out.println("Client Principal after"+ clientPrincipal);
+        servicePrincipal = serviceP;
+        server = serverIp;
+        port = serverPt;
         int ret=0;
         String error="";
         String ticket="";
-//      System.out.println("serverP "+ serverP);
-//      System.out.println("serverIp "+ serverIp);
-//      System.out.println("serverPt "+ serverPt);
-
-        //port = Integer.valueOf(serverPt);     
+      System.out.println("serverP "+ serviceP);
+      System.out.println("serverIp "+ serverIp);
+      System.out.println("serverPt "+ serverPt);
+      File src = new File("/data/local/kerberos/ccache/krb5cc_" + uid);
+      File des = new File("/data/local/kerberos/ccache/krb5cc_" + servicePrincipal+"_"+clientPrincipal);
+      try {
+        copy(src,des);
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+      ret = nativeSetKRB5CCNAME("/data/local/kerberos/ccache/krb5cc_" + servicePrincipal+"_"+clientPrincipal); 
         try {
             ret = startClient();
         } catch (Exception e) {
@@ -174,11 +201,11 @@ public class KerberosAppActivity extends TabActivity
 //            e.printStackTrace();
 //        }
         //read from file to byte
-        File file = new File("/data/local/kerberos/ccache/krb5cc_" + uid);
-        int size = (int) file.length();
+      //  File file = new File("/data/local/kerberos/ccache/krb5cc_" + servicePrincipal+"_"+clientPrincipal);
+        int size = (int) des.length();
         byte[] bytes = new byte[size];
         try {
-            BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+            BufferedInputStream buf = new BufferedInputStream(new FileInputStream(des));
             buf.read(bytes, 0, bytes.length);
             buf.close();
         } catch (FileNotFoundException e) {
@@ -189,7 +216,7 @@ public class KerberosAppActivity extends TabActivity
             e.printStackTrace();
         }
         //bytes has the ticket
-
+        ret = nativeSetKRB5CCNAME("/data/local/kerberos/ccache/krb5cc_" + uid);
 
         System.out.println("TICKET IS "+ bytes);
         return bytes;
@@ -205,8 +232,7 @@ public class KerberosAppActivity extends TabActivity
 			
 			TextView tv = (TextView) findViewById(R.id.textViewClient);
 			EditText principal = (EditText) findViewById(R.id.etClientPrincipal);
-			//String prinValue = principal.getText().toString();
-			String prinValue="lsyang";
+			String prinValue = principal.getText().toString();
             String argString;
             int ret = 0;
 			
@@ -278,6 +304,7 @@ public class KerberosAppActivity extends TabActivity
 	        	        
 	        if(t == 1)
 	        	tv.append("Failed to find Ticket!\n");
+	        System.out.println("TV from tv" + tv);
 		}
 	};
 	
@@ -468,10 +495,13 @@ public class KerberosAppActivity extends TabActivity
             // TODO Auto-generated method stub
         	System.out.println("Received at Kerb");
     		Log.d("Debug", "Received at Kerb");
-    		String s = intent.getExtras().getString("package");
-    		System.out.println("PACKKKKK" + s);
-    		Log.d("Debug", s);
-    		sendTicket(context, s, getServiceTicket("", "", 0, ""));
+    		//String s = intent.getExtras().getString("package");
+    		//System.out.println("PACKKKKK" + s);
+    		//Log.d("Debug", s);
+    		sendTicket(context, intent.getExtras().getString("package"), getServiceTicket(
+    		        intent.getExtras().getString("servicePrincipal"), 
+    		        intent.getExtras().getString("server"), 
+    		        intent.getExtras().getInt("port")));
         }
     };
 	
